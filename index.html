@@ -26,7 +26,7 @@
 		let spaceshipPos = Math.round(cols / 2);
 		let currentBullets = [];
 		let invaders = [];
-		let obstacles = [];
+		let objects = [];
 		let run = 0;
 		let xoffset = 0;
 		let yoffset = 0;
@@ -37,7 +37,7 @@
 		const invaderWidth = 8;
 		const invaderHeight = 5;
 		let rowId = 0;
-		let killedInvaderCount = 0;
+		let kills= 0;
 
 
 
@@ -66,8 +66,8 @@
 
 			//TODO Invaders erzeugen und in Array (invaders) schreiben damit sie gerendet werden können
 
-			//Obstacles erzeugen
-			obstacles.push({
+			//objects erzeugen
+			objects.push({
 				x: Math.round(cols / 2) - 5,
 				y: rows - 10,
 				width: 10,
@@ -100,8 +100,8 @@
 			//Zusätzliche Characters wegen Zeilenumbrüchen
 			let rowOffset = posY;
 			//Position im Gesamtstring, (AnzahlZeilen/YPos+i)*ZeichenProZeile plus rowOffset plus momentan gezeichnete Zeile des Ships
-			let posInString = posY * cols + rowOffset + posX;
-			return posInString;
+			let stringpos = posY * cols + rowOffset + posX;
+			return stringpos;
 		}
 
 		//Spieler-Interaktionen verschicken
@@ -152,8 +152,8 @@
 			}
 		}
 
-		function renderObstacles() {
-			obstacles.forEach((obstacle) => {
+		function renderobjects() {
+			objects.forEach((obstacle) => {
 				for (var i = 0; i < obstacle.height; i++) {
 					//Zeilenweise in String schreiben
 					renderStr = setCharsAt(renderStr, xyToStringPos(obstacle.x, obstacle.y + i), obstacle.char.repeat(obstacle
@@ -173,12 +173,14 @@
 			
 			for (let invaderPos = invaders[rowId].posX; invaderPos <= invaders[rowId].posX + 5*(invaderWidth*2+invaderWidth/2); invaderPos = invaderPos + invaderWidth*2+invaderWidth/2) {
 					if (bullet.x > invaderPos && bullet.x < invaderPos + invaderWidth*2 + invaderWidth) {
-						invaders[rowId].invaders[currentId].ischBinKaputt = true;
+						invaders[rowId].invaders[currentId].knock = true;
 						invaders[rowId].invaders[currentId].explode();
-						killedInvaderCount++;
+						kills++;
 						console.log("blub")
 						break;
+
 					}
+	
 					currentId++;
 				}
 				currentBullets = currentBullets.filter(currentBullet => currentBullet != bullet);
@@ -375,7 +377,7 @@
 				renderStr = renderBackground(rows, cols);
 
 				//Render Obstacle
-				renderObstacles();
+				renderobjects();
 
 				//Render Spaceship
 				renderSpaceship(spaceshipPos, rows - 3, renderStr);
@@ -394,6 +396,7 @@
 
 				//Gesamtergebnis anzeigen
 				document.getElementById("console").innerText = renderStr;
+				
 			}
 
 			//Es geht los - alle 40 Millisekunden rendern

@@ -6,19 +6,18 @@ class Helper {
 }
 
 class Invader {
-  constructor(appearance, ischBinKaputt, explodeTime, id) {
+  constructor(appearance, knock, explodeTime, id) {
     this.appearance = appearance;
     this.id = id;
-    this.ischBinKaputt = ischBinKaputt;
+    this.knock = knock;
     this.explodeTime = explodeTime;
 }
 
-  shootLaser() {
-    console.log("Invader " +this.id+" Laser shot")
+  shootBullet() {
+    console.log("Invader " +this.id+" bullet shot")
   }
 
   explode() {
-    console.log("blub2");
     
     this.appearance =
      ["     _______      ",
