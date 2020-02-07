@@ -1,5 +1,10 @@
+# 01_03_spacebase
+Space Invaders Beta
+
 # Space Invaders, IoT 1
 # Marius Schairer, Noah Mantel
+
+![](https://raw.githubusercontent.com/Nodarida/01_03_spacebase/master/SpaceInvaders.png)
 
 Unser erstes Projekt im Fach Programmiersprachen (Dozent: Florian Geiselhart) war ein Space-Invaders-Game zu programmieren. 
 
@@ -14,6 +19,7 @@ Wir haben dem gesamten Game noch eigene persönliche Ziele hinzugefügt:
 1. Musik und andere Soundeffects
 2. Stylesheet erstellen
 3. funktionales Scoreboard
+
 
 
 
@@ -125,61 +131,48 @@ Um das Aussehen des Spaceships definieren zu können erstellten wir eine Variabl
 function renderSpaceship(posX, posY)
 let spaceship = ["◄▀▀████▀▀►"]
 
-# Stylesheet
+- function renderBullets(): mit dieser Funktion schaffen wir es unter anderem die Kugeln, welche am oberen Rand des Screens angekommen sind zu entfernen. Hierbei benötigten wir ein wenig Hile. Ziel der abgebildeten Funktionen war es hauptsächlich die Bewegung der Bullets sowie die Detection der Treffer herauszufinden. 
 
-Um dem Spiel ein schönes Design zu geben erstellten wir ein Stylesheet. CSS Stylesheets werden in HTML verwendet um das Layout der Seite zu gestalten.
+function renderBullets() {
+					//Kugeln entfernen die am oberen Rand angekommen sind ohne Treffer
+					currentBullets = currentBullets.filter(bullet => bullet.y > 1);
+					//Kugeln einen Schritt weiter bewegen, dann rendern
+					currentBullets.forEach((bullet) => {
+						bullet.y -= 1;
+						if (renderStr[xyToStringPos(bullet.x, bullet.y - 1)] == '▓') {
+							let currentId = 0;
+							for (let invaderPos = invaders[rowId].posX; invaderPos <= invaders[rowId].posX + 5 * (invaderWidth * 2 + /* wird geprüft ob Invader getroffen wurde */
+									invaderWidth / 2); invaderPos = invaderPos + invaderWidth * 2 + invaderWidth / 2) {
+								if (bullet.x > invaderPos && bullet.x < invaderPos + invaderWidth * 2 + invaderWidth) {
+									invaders[rowId].invaders[currentId].knock = true; /* ermittelt ob getroffen wurde */
+									invaders[rowId].invaders[currentId].explode();
+									kills++;
+									break;
 
-- pre: wird eingesetzt sobald die Formatierung von Texten benötigt wird. Hier wurde die Größe des Game-Screens definiert. 
-Die Fläche bekam zusätzlich einen Rand von 5px.
+                  
+ um anschließend die getroffenen Invader löschen zu können. Dies gilt natürlich auch für die Objekte der getroffenen Invader. Zu guter Letzt bestimmten wir das Symbol der einzelnen Bullets. 
 
-pre {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  -webkit-transform:
- translate(-50%, -50%); 
-			transform: translate(-50%, -50%);
-			border: 5px solid rgb(57, 255, 14);
-}
-
-Mit "body" wurde die Farbe, Hintergrundfarbe und die Schriftart im Screen definiert.
-
-body {
-  color: yellowgreen; 
-  background-color: black; 
-  font-family: 'press start 2P'; 
-  }
-
-  Mit der class ".title" erstellten wir die Eigenschaften der Überschrift. Diese class wurde in der HTML Datei importiert. In dieser Klasse wurde die Schriftart, Textfarbe, Textgröße sowie Textposition bestimmt. 
-
-.title {
-    font-family: 'Press Start 2P'; 
-    color:purple; 
-    font-size: 30px; 
-    text-align: center; 
-  }
-
-Mit einer weiteren class gestalteten wir auch das Scoreboard. Dasselbe Prinzip nur zusätzlich die Positionsangaben mit vh.
-
-  .scoreboard {
-    font-family: 'Press Start 2P', cursive;
-    color: purple;
-    font-size: 20px;
-    position: absolute; /* Textposition */
-    top: 10vh; /* Position von oben */
-  }
-
+ 		currentBullets = currentBullets.filter(currentBullet => currentBullet != bullet); /* Invader getroffen? - anschließend gelöscht */
+						}
+						if (renderStr[xyToStringPos(bullet.x, bullet.y - 1)] == '=') {
+							currentBullets = currentBullets.filter(currentBullet => currentBullet != bullet); /* Bullets werden gelöscht wenn Objekt getroffen wird */
+						}
+						renderStr = Helper.setCharsAt(renderStr, xyToStringPos(bullet.x, bullet.y), "💣"); /* Bullet Zeichen bestimmen*/
+					})
+				}  
+				
 # Classes
-In den Klassen haben wir die Funktionen definiert, die wir im index.html code durch aktionen aufrufen
 
-class Helper {
+In den Klassen haben wir die Funktionen definiert, die wir im index.html Code durch Aktionen aufrufen.
+
+- class Helper {
   static 	setCharsAt(str,index,chr) {      
     if(index > str.length-1) return str;
     return str.substr(0,index) + chr + str.substr(index+chr.length);
   }
 }
 
-In der class Invader haben wir das Aussehen, den Zustand und die Explusionszeit definiert 
+- In dieser "class Invader" haben wir das Aussehen, den Zustand und die Explusionszeit bestimmt: 
 
 class Invader {
   constructor(appearance, knock, explodeTime, id) { /* constructor initialisiert Objekte */
@@ -194,12 +187,12 @@ class Invader {
     console.log("Invader " +this.id+" bullet shot")
   }
 
-die Klasse explode definiert das Aussehen der Spaceinvader wenn sie getroffen wurden. Sie sind aus ASCII zeichen zusammengesetzt.
+- die Klasse "explode" definiert das Aussehen der SpaceInvader wenn sie getroffen wurden. Sie sind aus ASCII-Zeichen zusammengesetzt.
 
   explode() {
     
     this.appearance =
-     ["     _______      ",
+     ["     ___      ",
       "   (  -_    _).   ",
       " ( ~       )   )  ",
       "( )  (    )  ()  )",   /* Aussehen der Explosion nachdem der Invader getroffen wird. ASCII ART Regeln beachten! */
@@ -212,7 +205,7 @@ die Klasse explode definiert das Aussehen der Spaceinvader wenn sie getroffen wu
   }
 }
 
-In der Klasse InderRow wird der Spacinvader definiert in Position, Breite und Höhe.
+- In der Klasse "InderRow" wird der SpacInvader definiert in Position, Breite und Höhe.
 
 class InvaderRow {
   constructor(posX, posY, width, height, invaders, id) { /* weitere Eigenschaften der InvaderRow */
@@ -224,7 +217,7 @@ class InvaderRow {
     this.invaders = invaders; 
   }
 
-Die Funktion step definiert wir die Invader sich im Screen nach unten bewegen. 
+- Die Funktion "step" bestimmt wie die Invader sich im Screen nach unten bewegen. 
 
   step(direction) {
     if (direction == 1) {  /* InvaderRow verläuft in die angegebene Richtung automatisch */
@@ -253,7 +246,8 @@ Die Funktion step definiert wir die Invader sich im Screen nach unten bewegen.
     return currentInvader;
   }
  
-  Static definiert wie die alle Invader in reihe im screen Dargestellt werden.der abstand zwische den Invaders wird durch let spacerWidth = invaderWidth/3 definiert. 
+- "Static" definiert, dass alle Invader in Reihe im Screen dargestellt werden. Der Abstand zwischen den Invader wird durch 
+"let spacerWidth = invaderWidth/3" definiert. 
 
   static generateInvaderRow(invaderWidth, invaderHeight) {
     let currentInvaders = [];
@@ -271,6 +265,54 @@ Die Funktion step definiert wir die Invader sich im Screen nach unten bewegen.
   }
 }
 
+
+
+# Stylesheet
+
+Um dem Spiel ein schönes Design zu geben erstellten wir ein Stylesheet. CSS Stylesheets werden in HTML verwendet um das Layout der Seite zu gestalten.
+
+- pre: wird eingesetzt sobald die Formatierung von Texten benötigt wird. Hier wurde die Größe des Game-Screens definiert. 
+Die Fläche bekam zusätzlich einen Rand von 5px.
+
+pre {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform:
+ translate(-50%, -50%); 
+			transform: translate(-50%, -50%);
+			border: 5px solid rgb(57, 255, 14);
+}
+
+- Mit "body" wurde die Farbe, Hintergrundfarbe und die Schriftart im Screen definiert.
+
+body {
+  color: yellowgreen; 
+  background-color: black; 
+  font-family: 'press start 2P'; 
+  }
+
+- Mit der class ".title" erstellten wir die Eigenschaften der Überschrift. Diese class wurde in der HTML Datei importiert. In dieser Klasse wurde die Schriftart, Textfarbe, Textgröße sowie Textposition bestimmt. 
+
+.title {
+    font-family: 'Press Start 2P'; 
+    color:purple; 
+    font-size: 30px; 
+    text-align: center; 
+  }
+
+- Mit einer weiteren class gestalteten wir auch das Scoreboard. Dasselbe Prinzip nur zusätzlich die Positionsangaben mit vh.
+
+  .scoreboard {
+    font-family: 'Press Start 2P', cursive;
+    color: purple;
+    font-size: 20px;
+    position: absolute; /* Textposition */
+    top: 10vh; /* Position von oben */
+  }
+
+
+
 # ToDo's
 
 Natürlich werden wir unsere Space Invader Version versuchen zu überarbeiten.
@@ -287,5 +329,3 @@ Hier eine kleine Liste von Dingen die wir noch gerne im Game hätten:
 
 Als Fazit hat uns dieses Projekt sehr Spaß gemacht. Wir lernten viele Grundlagen von JS und konnten mit dem Projekt des Space Invader - Game verschiedene Anwendungsmöglichkeiten in Javascript üben und ausprobieren. Auch wenn es nicht immer einfach war die verschiedenen Anwendunsvorgänge auf den ersten Anhieb zu verstehen (oder eine Klammer zu vergessen). Letztlich denken wir aber dass es für beide von uns eine gute Übung war und wir einiges mitnehmen konnten.
 Danke natürlich an unseren Dozenten Florian Geiselhart der uns bei dem Coding-Prozess geholfen hat.
-
-
