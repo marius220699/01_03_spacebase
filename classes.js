@@ -18,6 +18,8 @@ class Invader {
   }
 
   explode() {
+    console.log("blub2");
+    
     this.appearance =
      ["     _______      ",
       "   (  -_    _).   ",

@@ -163,64 +163,54 @@
 		}
 
 		function renderBullets() {
+			currentBullets = currentBullets.filter(bullet => bullet.y > 1);
+		//Kugeln einen Schritt weiter bewegen, dann rendern
+		currentBullets.forEach((bullet) => {
+			bullet.y -= 1;
+			if (renderStr[xyToStringPos(bullet.x, bullet.y - 1)] == '▓') {
+				let currentId = 0;
 			//TODO: Prüfen ob eine Kugel einen Invader oder ein Obstacle trifft, wenn ja Aktion auslösen
-			for (let b = 0; b < currentBullets.width; b++) {
-				for (let r = 0; r < invaders.width; r++) {
-					for (let i = 0; i < invaders[r].invaders.width; i++) {
-						const inv = invaders[r].invaders[i];
-						const bullet = currentBullets[b];
-						//test
-						const dist = Math.sqrt(Math.pow((inv.posX + xoffset + inv.width - bullet.posX), 2) + Math.pow((inv.posY +
-							yoffset + inv.height / 2 - bullet
-							.posY), 2));
-
-						//explode
-						if (dist < inv.width / 2) {
-							inv.explode();
-							if (inv.explodeState <= 1) {
-								bullet.posY = 0;
-								invaderShotCount += 1;
-							}
-						}
+			
+			for (let invaderPos = invaders[rowId].posX; invaderPos <= invaders[rowId].posX + 5*(invaderWidth*2+invaderWidth/2); invaderPos = invaderPos + invaderWidth*2+invaderWidth/2) {
+					if (bullet.x > invaderPos && bullet.x < invaderPos + invaderWidth*2 + invaderWidth) {
+						invaders[rowId].invaders[currentId].ischBinKaputt = true;
+						invaders[rowId].invaders[currentId].explode();
+						killedInvaderCount++;
+						console.log("blub")
+						break;
 					}
+					currentId++;
 				}
-			}		
+				currentBullets = currentBullets.filter(currentBullet => currentBullet != bullet);
+			}
+			if (renderStr[xyToStringPos(bullet.x, bullet.y - 1)] == '=') {
+				currentBullets = currentBullets.filter(currentBullet => currentBullet != bullet);
+			}	
+			renderStr = Helper.setCharsAt(renderStr,xyToStringPos(bullet.x, bullet.y),"💣"); 
+		})			
+	}
 		
 	
 			//Kugeln entfernen die am oberen Rand angekommen sind ohne Treffer
-			currentBullets = currentBullets.filter(bullet => bullet.y > 1);
+			//currentBullets = currentBullets.filter(bullet => bullet.y > 1);
 						//Kugeln einen Schritt weiter bewegen, dann rendern
-						currentBullets.forEach((bullet) => {
+					/*	currentBullets.forEach((bullet) => {
 							bullet.y -= 1;
-							renderStr = setCharsAt(renderStr, xyToStringPos(bullet.x, bullet.y), "1");
-						})
-		}
+							renderStr = setCharsAt(renderStr, xyToStringPos(bullet.x, bullet.y), "💣");
+						})*/
+
+		
 		//TODO: Prüfen ob eine Kugel einen Invader oder ein Obstacle trifft, wenn ja Aktion auslösen
-		for (let r = 0; r < invaders.length; r++) {
-				for (let i = 0; i < invaders[r].invaders.length; i++) {
-					for (let l = 0; l < invaders[r].invaders[i].lasers.length; l++) {
-						const laser = invaderRows[r].invaders[i].lasers[l];
-						
-						const dist = Math.sqrt(Math.pow((laser.posX + xoffset - (spaceshipPos + 3)), 2) + Math.pow((laser
-							.posY + yoffset - (rows - 2)), 2));
-
-
-
-						if (dist < 3) {
-							if (endOfGame < 1) {
-								endOfGame += 1;
-								speed = 5;
-								spaceship = [];
-							}
-							/*
-							if (inv.explodeState <= 1) {
-								bullet.posY = 0;
-							}
-							*/
-						}
-					}
-				}
+		
+	function renderInvaderRow(invaders) {
+		let currentInvXPos = invaders[rowId].posX;
+		for (let j = 0; j < invaders[rowId].invaders.length; j++) {
+			for (let i = 0; i < invaders[rowId].invaders[j].appearance.length; i++) {
+				renderStr = Helper.setCharsAt(renderStr,xyToStringPos(invaders[rowId].invaders[j].id + currentInvXPos, invaders[rowId].posY+i), invaders[rowId].invaders[j].appearance[i]);		
+			}
+			currentInvXPos = currentInvXPos + invaderWidth* 2 + invaderWidth/2;
 		}
+	}
 		
 
 					//	renderStr = Helper.setCharsAt(renderStr, Helper.xyToStringPos(spaceshipPos + 3, rows - 2, cols), "X")
